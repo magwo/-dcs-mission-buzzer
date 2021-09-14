@@ -1,0 +1,1 @@
+pyinstaller --console --name dcs-mission-buzzer --add-data="settings.json;." main.py
