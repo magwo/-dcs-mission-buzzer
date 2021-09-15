@@ -4,9 +4,9 @@
         "end": "2012-01-01"
     },
     "day_time_chances": {
-        "dawn": 50,
-        "day": 50,
-        "dusk": 0,
-        "dight": 0
+        "Dawn": 50,
+        "Day": 50,
+        "Dusk": 0,
+        "Night": 0
     }
 }
