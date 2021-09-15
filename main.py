@@ -1,4 +1,5 @@
-from util import print_bold, print_warning
+from buzzer import Buzzer
+from loggin_util import print_bold, print_warning
 import dcs
 import sys
 import json
@@ -27,7 +28,8 @@ print("Loaded mission file", in_filename)
 with open('settings.json', "r") as f:
     json_content = f.read()
     settings = json.loads(json_content)
-    # TODO: Buzz
+    buzzer = Buzzer()
+    buzzer.buzz(m, settings)
 
 out_filename = sys.argv[2] if len(sys.argv) > 2 else None
 if not out_filename:
@@ -40,5 +42,3 @@ if out_filename:
     print("Saved to {}".format(out_filename))
 else:
     print("Dry run was completed")
-
-input("Press Enter to continue...")

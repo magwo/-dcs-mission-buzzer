@@ -1,3 +1,12 @@
 {
-    
+    "random_date_range": {
+        "start": "2004-01-01",
+        "end": "2012-01-01"
+    },
+    "day_time_chances": {
+        "dawn": 50,
+        "day": 50,
+        "dusk": 0,
+        "dight": 0
+    }
 }
