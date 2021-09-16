@@ -8,5 +8,6 @@
         "Day": 50,
         "Dusk": 0,
         "Night": 0
-    }
+    },
+    "random_seed_method": "THEATER_AND_TODAYS_DATE"
 }

@@ -18,6 +18,11 @@ from dcs.terrain import (
 
 class Buzzer:
     def buzz(self, m: Mission, settings: dict):
+        if settings.get("random_seed_method") == "THEATER_AND_TODAYS_DATE":
+            seed = f"{m.terrain.name}_{str(datetime.datetime.now().date())}"
+            print("Seed is", seed)
+            random.seed(seed)
+
         seasonal_conditions = Buzzer.get_seasonal_conditions(m.terrain)
         date = Buzzer.get_random_date(settings.get("random_date_range").get("start"), settings.get("random_date_range").get("end"))
         day_time_chances = settings.get("day_time_chances")
