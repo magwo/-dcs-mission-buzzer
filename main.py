@@ -1,8 +1,10 @@
+import os
 from buzzer import Buzzer
 from loggin_util import print_bold, print_warning
 import dcs
 import sys
 import json
+from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 
@@ -29,7 +31,14 @@ with open('settings.json', "r") as f:
     json_content = f.read()
     settings = json.loads(json_content)
     buzzer = Buzzer()
-    buzzer.buzz(m, settings)
+    result = buzzer.buzz(m, settings)
+
+    if settings.get("write_result_json"):
+        filename = f"{result.theater}.json"
+        file_path = Path(settings.get("result_json_path"), filename)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as result_file:
+            json.dump(result.toDict(), result_file, ensure_ascii=False, indent=4)
 
 out_filename = sys.argv[2] if len(sys.argv) > 2 else None
 if not out_filename:

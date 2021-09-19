@@ -1,5 +1,9 @@
+from dataclasses import dataclass
 import datetime
 import random
+from utils import Heading
+
+from dcs.weather import Wind
 from loggin_util import print_bold
 from environmentgen import EnvironmentGenerator
 from weather import Conditions, TimeOfDay
@@ -16,8 +20,39 @@ from dcs.terrain import (
     marianaislands,
 )
 
+@dataclass(frozen=True)
+class BuzzResult:
+    theater: str
+    date: str
+    conditions: Conditions
+
+    def toDict(self) -> dict:
+        return {
+            "theater": self.theater,
+            "date": self.date,
+            "time": self.conditions.start_time.time().isoformat(),
+            "temperature_c": self.conditions.weather.atmospheric.temperature_celsius,
+            "qnh_inches_hg": self.conditions.weather.atmospheric.qnh.inches_hg,
+            "qnh_hecto_pascals": self.conditions.weather.atmospheric.qnh.hecto_pascals,
+            "precipitation": self.conditions.weather.clouds.precipitation.name.replace("_", "") if self.conditions.weather.clouds else "None", 
+            "cloud_preset": self.conditions.weather.clouds.preset.ui_name if self.conditions.weather.clouds and self.conditions.weather.clouds.preset else "None",
+            "cloud_base": self.conditions.weather.clouds.base if self.conditions.weather.clouds else "-",
+            "fog_visibility_meters": self.conditions.weather.fog.visibility.meters if self.conditions.weather.fog else "-",
+            "fog_thickness": self.conditions.weather.fog.thickness if self.conditions.weather.fog else "-",
+            "wind_0m": self.wind_dict(self.conditions.weather.wind.at_0m),
+            "wind_2000m": self.wind_dict(self.conditions.weather.wind.at_2000m),
+            "wind_8000m": self.wind_dict(self.conditions.weather.wind.at_8000m),
+        }
+    
+    def wind_dict(self, wind: Wind):
+        return {
+            "speed_mps": wind.speed,
+            "direction": wind.direction,
+            "direction_opposite": Heading(wind.direction).opposite.degrees
+        }
+
 class Buzzer:
-    def buzz(self, m: Mission, settings: dict):
+    def buzz(self, m: Mission, settings: dict) -> BuzzResult:
         if settings.get("random_seed_method") == "THEATER_AND_TODAYS_DATE":
             seed = f"{m.terrain.name}_{str(datetime.datetime.now().date())}"
             print("Seed is", seed)
@@ -38,11 +73,14 @@ class Buzzer:
         print("Wind at 2000m:", conditions.weather.wind.at_2000m.__dict__)
         print("Wind at 8000m:", conditions.weather.wind.at_8000m.__dict__)
         print("Clouds:", conditions.weather.clouds)
-        if conditions.weather.clouds:
+        if conditions.weather.clouds and conditions.weather.clouds.preset:
             print("Cloud preset:", conditions.weather.clouds.preset.__dict__)
         print("Fog:", conditions.weather.fog)
         print("Atmospheric:", conditions.weather.atmospheric)
         EnvironmentGenerator(m, conditions).generate()
+
+
+        return BuzzResult(m.terrain.name, str(date.date()), conditions)
 
 
     @staticmethod
@@ -71,7 +109,7 @@ class Buzzer:
         raise ValueError(terrain)
 
     @staticmethod
-    def get_random_date(start_date_iso: str, end_date_iso: str) -> SeasonalConditions:
+    def get_random_date(start_date_iso: str, end_date_iso: str) -> datetime.datetime:
         def random_date(start, end):
             """Generate a random datetime between `start` and `end`"""
             return start + datetime.timedelta(

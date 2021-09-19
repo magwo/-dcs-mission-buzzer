@@ -221,7 +221,7 @@ class ClearSkies(Weather):
         return None
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(0, 4)
+        return self.random_wind(1, 4)
 
 
 class Cloudy(Weather):
@@ -241,7 +241,7 @@ class Cloudy(Weather):
         return None
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(0, 4)
+        return self.random_wind(1, 4)
 
 
 class Raining(Weather):
@@ -261,7 +261,7 @@ class Raining(Weather):
         return None
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(0, 6)
+        return self.random_wind(1, 6)
 
 
 class Thunderstorm(Weather):
@@ -282,7 +282,7 @@ class Thunderstorm(Weather):
         )
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(0, 8)
+        return self.random_wind(1, 8)
 
 
 @dataclass

@@ -9,5 +9,7 @@
         "Dusk": 0,
         "Night": 0
     },
-    "random_seed_method": "THEATER_AND_TODAYS_DATE"
+    "random_seed_method": "THEATER_AND_TODAYS_DATE",
+    "write_result_json": true,
+    "result_json_path": "conditions"
 }
