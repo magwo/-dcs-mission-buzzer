@@ -1,1 +1,1 @@
-pyinstaller --console --name dcs-mission-buzzer --add-data="settings.json;." --add-data="resources/caucasus.p;dcs/terrain/" --add-data="resources/nevada.p;dcs/terrain/" main.py
+pyinstaller --console --name dcs-mission-buzzer --add-data="settings.json;." main.py
