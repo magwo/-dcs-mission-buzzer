@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from buzzer import Buzzer
 from loggin_util import print_bold, print_warning
@@ -11,7 +12,7 @@ from tkinter import filedialog
 root = tk.Tk()
 root.withdraw()
 
-version = "1.1.2"
+version = "1.1.3"
 print_bold(f"DCS Mission Buzzer v{version} by Mags")
 
 in_filename = sys.argv[1] if len(sys.argv) > 1 else None
@@ -34,7 +35,7 @@ with open('settings.json', "r") as f:
     result = buzzer.buzz(m, settings)
 
     if settings.get("write_result_json"):
-        filename = f"{result.theater}.json"
+        filename = f"{result.theater}{datetime.now().date().isoformat()}.json"
         file_path = Path(settings.get("result_json_path"), filename)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w', encoding='utf-8') as result_file:
