@@ -31,14 +31,14 @@ class BuzzResult:
             "theater": self.theater,
             "date": self.date,
             "time": self.conditions.start_time.time().isoformat(),
-            "temperature_c": self.conditions.weather.atmospheric.temperature_celsius,
-            "qnh_inches_hg": self.conditions.weather.atmospheric.qnh.inches_hg,
-            "qnh_hecto_pascals": self.conditions.weather.atmospheric.qnh.hecto_pascals,
+            "temperature_c": f'{self.conditions.weather.atmospheric.temperature_celsius:.0f}',
+            "qnh_inches_hg": f'{self.conditions.weather.atmospheric.qnh.inches_hg:.2f}',
+            "qnh_hecto_pascals": f'{self.conditions.weather.atmospheric.qnh.hecto_pascals:.1f}',
             "precipitation": self.conditions.weather.clouds.precipitation.name.replace("_", "") if self.conditions.weather.clouds else "None", 
             "cloud_preset": self.conditions.weather.clouds.preset.ui_name if self.conditions.weather.clouds and self.conditions.weather.clouds.preset else "None",
-            "cloud_base": self.conditions.weather.clouds.base if self.conditions.weather.clouds else "-",
-            "fog_visibility_meters": self.conditions.weather.fog.visibility.meters if self.conditions.weather.fog else "-",
-            "fog_thickness": self.conditions.weather.fog.thickness if self.conditions.weather.fog else "-",
+            "cloud_base": str(self.conditions.weather.clouds.base) if self.conditions.weather.clouds else "-",
+            "fog_visibility_meters": str(int(self.conditions.weather.fog.visibility.meters)) if self.conditions.weather.fog else "-",
+            "fog_thickness": str(self.conditions.weather.fog.thickness) if self.conditions.weather.fog else "-",
             "wind_0m": self.wind_dict(self.conditions.weather.wind.at_0m),
             "wind_2000m": self.wind_dict(self.conditions.weather.wind.at_2000m),
             "wind_8000m": self.wind_dict(self.conditions.weather.wind.at_8000m),
@@ -46,9 +46,9 @@ class BuzzResult:
     
     def wind_dict(self, wind: Wind):
         return {
-            "speed_mps": wind.speed,
-            "direction": wind.direction,
-            "direction_opposite": Heading(wind.direction).opposite.degrees
+            "speed_mps": f'{wind.speed:.1f}',
+            "direction": str(int(wind.direction)),
+            "direction_opposite": str(int(Heading(wind.direction).opposite.degrees))
         }
 
 class Buzzer:
