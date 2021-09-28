@@ -11,5 +11,7 @@
     },
     "random_seed_method": "THEATER_AND_TODAYS_DATE",
     "write_result_json": true,
-    "result_json_path": "conditions"
+    "result_json_path": "conditions",
+    "relocate_carrier_groups": true,
+    "carrier_relocation_radius_nm": 50
 }

@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 from buzzer import Buzzer
+from carrier_relocator import CarrierRelocator
 from loggin_util import print_bold, print_warning
 import dcs
 import sys
@@ -33,6 +34,10 @@ with open('settings.json', "r") as f:
     settings = json.loads(json_content)
     buzzer = Buzzer()
     result = buzzer.buzz(m, settings)
+
+    if settings.get("relocate_carrier_groups", False):
+        relocator = CarrierRelocator(m, result.conditions.weather.wind.at_0m, settings)
+        relocator.relocate_carrier_groups()
 
     if settings.get("write_result_json"):
         filename = f"{result.theater}{datetime.now().date().isoformat()}.json"
