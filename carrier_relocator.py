@@ -21,11 +21,11 @@ carrier_type_ids = [
 ]
 
 carrier_deck_angles: dict[str, int] = {
-    Stennis.id: -9,
-    CVN_71.id: -9,
-    CVN_72.id: -9,
-    CVN_73.id: -9,
-    CVN_75.id: -9,
+    Stennis.id: -9.12,
+    CVN_71.id: -9.12,
+    CVN_72.id: -9.12,
+    CVN_73.id: -9.12,
+    CVN_75.id: -9.12,
     LHA_Tarawa.id: 0,
 }
 
