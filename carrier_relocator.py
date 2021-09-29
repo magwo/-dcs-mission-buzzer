@@ -63,7 +63,7 @@ class CarrierRelocator:
             group.add_point(MovingPoint())
         
         carrier = group.units[0]
-        cruise = CarrierRelocator.get_carrier_cruise(self.wind_0m, carrier_deck_angles.get(carrier.type), Speed.from_knots(10), Speed.from_knots(25))
+        cruise = CarrierRelocator.get_carrier_cruise(self.wind_0m, carrier_deck_angles.get(carrier.type), Speed.from_knots(3), Speed.from_knots(25))
         print(f"Wind is {self.wind_0m.speed}m/s {self.wind_0m.direction}deg")
         print("Cruise is", cruise)
 
@@ -71,6 +71,7 @@ class CarrierRelocator:
         carrier_end_pos = group.position.point_from_heading(cruise.heading.degrees, radius.meters)
 
         group.points[0].position = carrier_start_pos
+        group.points[0].speed = cruise.speed.meters_per_second
         group.points[1].position = carrier_end_pos
         group.points[1].ETA_locked = False
         group.points[1].speed = cruise.speed.meters_per_second
