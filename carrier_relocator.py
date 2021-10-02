@@ -91,7 +91,6 @@ class CarrierRelocator:
 
         heading_change = cruise.heading.degrees - group_heading_before_change
         CarrierRelocator.rotate_group_around(group, group.points[0].position, heading_change)
-        group.formation_star(cruise.heading.degrees, Distance.from_nautical_miles(1).meters)
         
 
     @staticmethod
