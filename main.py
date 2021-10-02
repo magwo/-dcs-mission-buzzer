@@ -13,7 +13,7 @@ from tkinter import filedialog
 root = tk.Tk()
 root.withdraw()
 
-version = "1.2.1"
+version = "1.2.2"
 print_bold(f"DCS Mission Buzzer v{version} by Mags")
 
 in_filename = sys.argv[1] if len(sys.argv) > 1 else None
