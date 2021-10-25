@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from dcs.mapping import Point
 from dcs.point import MovingPoint
 
-from dcs.ships import CVN_71, CVN_72, CVN_73, CVN_75, LHA_Tarawa, Stennis
+from dcs.ships import CVN_71, CVN_72, CVN_73, CVN_75, LHA_Tarawa, Stennis, Forrestal
 from dcs.unitgroup import Group, ShipGroup
 
 from utils import Distance, Heading, Speed
@@ -14,6 +14,7 @@ from dcs.mission import Mission
 
 carrier_type_ids = [
     Stennis.id,
+    Forrestal.id,
     CVN_71.id,
     CVN_72.id,
     CVN_73.id,
@@ -23,6 +24,7 @@ carrier_type_ids = [
 
 carrier_deck_angles: dict[str, int] = {
     Stennis.id: -9.12,
+    Forrestal.id: -9.12,
     CVN_71.id: -9.12,
     CVN_72.id: -9.12,
     CVN_73.id: -9.12,
