@@ -4,6 +4,7 @@ from dcs.point import MovingPoint
 
 from dcs.ships import CVN_71, CVN_72, CVN_73, CVN_75, LHA_Tarawa, Stennis, Forrestal
 from dcs.unitgroup import Group, ShipGroup
+from trigonometric_carrier_cruise import get_ship_course_and_speed
 
 from utils import Distance, Heading, Speed
 from dcs.weather import Wind
@@ -66,7 +67,7 @@ class CarrierRelocator:
             group.add_point(MovingPoint())
         
         carrier = group.units[0]
-        cruise = CarrierRelocator.get_carrier_cruise(self.wind_0m, carrier_deck_angles.get(carrier.type), Speed.from_knots(3), Speed.from_knots(25))
+        cruise = CarrierRelocator.get_carrier_cruise(self.wind_0m, carrier_deck_angles.get(carrier.type), Speed.from_knots(25))
         print(f"Wind is {self.wind_0m.speed}m/s {self.wind_0m.direction}deg")
         print("Cruise is", cruise)
 
@@ -91,23 +92,30 @@ class CarrierRelocator:
         for unit in group.units:
             unit.position = unit.position + position_change
 
+        print(f"Heading before {group_heading_before_change}")
         heading_change = cruise.heading.degrees - group_heading_before_change
+        print(f"Heading change {heading_change}")
         CarrierRelocator.rotate_group_around(group, group.points[0].position, heading_change)
+        print("Heading after change", group.points[0].position.heading_between_point(group.points[1].position))
         
 
     @staticmethod
-    def get_carrier_cruise(wind: Wind, deck_angle: int, s_min: Speed, s_max: Speed) -> HeadingAndSpeed:
-        print("Computing carrier cruise configuration")
+    def get_carrier_cruise(wind: Wind, deck_angle: int, desired_apparent_wind: Speed) -> HeadingAndSpeed:
         wind_speed = Speed.from_meters_per_second(wind.speed)
-        carrier_speed = max(s_min, s_max - wind_speed)
 
-        speed_factor = carrier_speed.knots / s_max.knots
-        angle_offset = deck_angle * (1.0 - speed_factor)
+        heading, speed, apparent_wind_angle = get_ship_course_and_speed(wind.direction, wind_speed.knots, desired_apparent_wind.knots)
+        
+        # Quick hack for Tarawa
+        if deck_angle == 0:
+            wind_heading = Heading(wind.direction)
+            heading = wind_heading.opposite.degrees
+            print("Tara Heading is", heading)
+        
+        solution = HeadingAndSpeed(Heading.from_degrees(heading), Speed.from_knots(speed))
 
-        wind_heading = Heading(wind.direction)
-        carrier_heading = Heading(wind_heading.opposite.degrees - angle_offset)
+        print("Trig cruise is", solution)
 
-        return HeadingAndSpeed(carrier_heading, carrier_speed)
+        return solution
 
 
     @staticmethod
