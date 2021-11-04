@@ -148,12 +148,10 @@ class CarrierRelocator:
         resolution = 30
         for i in range(0, resolution+1):
             hdg = hdg_p1_p2 - 90 + i * (180 / resolution)
-            print("hdg semicircle 1", hdg)
             points.append(p2.point_from_heading(hdg, radius))
 
         for i in range(0, resolution+1):
             hdg = hdg_p1_p2 + 90 + i * (180 / resolution)
-            print("hdg semicircle 2", hdg)
             points.append(p1.point_from_heading(hdg, radius))
 
         # Transform points to local coordinates
