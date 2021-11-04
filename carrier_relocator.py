@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import List
+from dcs.drawing.drawings import StandardLayer
 from dcs.mapping import Point
 from dcs.point import MovingPoint
 
@@ -10,7 +12,7 @@ from utils import Distance, Heading, Speed
 from dcs.weather import Wind
 from loggin_util import print_bold, print_warning
 from dcs.mission import Mission
-
+from dcs.drawing import Rgba
 
 
 carrier_type_ids = [
@@ -97,7 +99,8 @@ class CarrierRelocator:
         print(f"Heading change {heading_change}")
         CarrierRelocator.rotate_group_around(group, group.points[0].position, heading_change)
         print("Heading after change", group.points[0].position.heading_between_point(group.points[1].position))
-        
+
+        CarrierRelocator.add_oblong(self.m, carrier_start_pos, carrier_end_pos, Distance.from_nautical_miles(50).meters, Rgba(50, 50, 50, 150), 4, Rgba(50, 50, 50, 50))
 
     @staticmethod
     def get_carrier_cruise(wind: Wind, deck_angle: int, desired_apparent_wind: Speed) -> HeadingAndSpeed:
@@ -132,3 +135,31 @@ class CarrierRelocator:
 
             unit.position = pivot.point_from_heading(new_heading, distance)
             unit.heading = Heading.from_degrees(unit.heading + degrees_change).degrees
+
+    
+    @staticmethod
+    def add_oblong(m: Mission, p1: Point, p2: Point, radius: float, color: Rgba, thickness: float, fill: Rgba):
+        layer = m.drawings.get_layer(StandardLayer.Common)
+        
+        hdg_p1_p2 = p1.heading_between_point(p2)
+
+        points: List[Point] = []
+
+        resolution = 30
+        for i in range(0, resolution+1):
+            hdg = hdg_p1_p2 - 90 + i * (180 / resolution)
+            print("hdg semicircle 1", hdg)
+            points.append(p2.point_from_heading(hdg, radius))
+
+        for i in range(0, resolution+1):
+            hdg = hdg_p1_p2 + 90 + i * (180 / resolution)
+            print("hdg semicircle 2", hdg)
+            points.append(p1.point_from_heading(hdg, radius))
+
+        # Transform points to local coordinates
+        startPoint = Point(points[0].x, points[0].y)
+        for point in points[1:]:
+            point.x -= startPoint.x
+            point.y -= startPoint.y
+        
+        layer.add_freeform_polygon(startPoint, points, color=color, fill=fill, line_thickness=thickness)
