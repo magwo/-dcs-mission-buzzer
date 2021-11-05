@@ -6,6 +6,7 @@ from dcs.point import MovingPoint
 
 from dcs.ships import CVN_71, CVN_72, CVN_73, CVN_75, LHA_Tarawa, Stennis, Forrestal
 from dcs.unitgroup import Group, ShipGroup
+from drawing import add_oblong
 from trigonometric_carrier_cruise import get_ship_course_and_speed
 
 from utils import Distance, Heading, Speed
@@ -100,7 +101,10 @@ class CarrierRelocator:
         CarrierRelocator.rotate_group_around(group, group.points[0].position, heading_change)
         print("Heading after change", group.points[0].position.heading_between_point(group.points[1].position))
 
-        CarrierRelocator.add_oblong(self.m, carrier_start_pos, carrier_end_pos, Distance.from_nautical_miles(50).meters, Rgba(50, 50, 50, 150), 4, Rgba(50, 50, 50, 50))
+        path_name = group.name + " carrier group"
+        layer = self.m.drawings.get_layer(StandardLayer.Common)
+        add_oblong(layer, carrier_start_pos, carrier_end_pos, Distance.from_nautical_miles(3).meters, Rgba(50, 50, 50, 255), 1, Rgba(50, 50, 50, 30), path_name)
+        layer.add_arrow(carrier_start_pos, carrier_start_pos.heading_between_point(carrier_end_pos) - 90, Distance.from_nautical_miles(5).meters, fill=Rgba(50, 50, 50, 90), line_thickness=0)
 
     @staticmethod
     def get_carrier_cruise(wind: Wind, deck_angle: int, desired_apparent_wind: Speed) -> HeadingAndSpeed:
@@ -135,29 +139,3 @@ class CarrierRelocator:
 
             unit.position = pivot.point_from_heading(new_heading, distance)
             unit.heading = Heading.from_degrees(unit.heading + degrees_change).degrees
-
-    
-    @staticmethod
-    def add_oblong(m: Mission, p1: Point, p2: Point, radius: float, color: Rgba, thickness: float, fill: Rgba):
-        layer = m.drawings.get_layer(StandardLayer.Common)
-        
-        hdg_p1_p2 = p1.heading_between_point(p2)
-
-        points: List[Point] = []
-
-        resolution = 30
-        for i in range(0, resolution+1):
-            hdg = hdg_p1_p2 - 90 + i * (180 / resolution)
-            points.append(p2.point_from_heading(hdg, radius))
-
-        for i in range(0, resolution+1):
-            hdg = hdg_p1_p2 + 90 + i * (180 / resolution)
-            points.append(p1.point_from_heading(hdg, radius))
-
-        # Transform points to local coordinates
-        startPoint = Point(points[0].x, points[0].y)
-        for point in points[1:]:
-            point.x -= startPoint.x
-            point.y -= startPoint.y
-        
-        layer.add_freeform_polygon(startPoint, points, color=color, fill=fill, line_thickness=thickness)

@@ -10,6 +10,8 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 
+from track_drawer import TrackDrawer
+
 root = tk.Tk()
 root.withdraw()
 
@@ -38,6 +40,10 @@ with open('settings.json', "r") as f:
     if settings.get("relocate_carrier_groups", False):
         relocator = CarrierRelocator(m, result.conditions.weather.wind.at_0m, settings)
         relocator.relocate_carrier_groups()
+
+    if settings.get("draw_tanker_tracks", True):
+        track_drawer = TrackDrawer(m, settings)
+        track_drawer.draw_tracks()
 
     if settings.get("write_result_json"):
         filename = f"{result.theater}{datetime.now().date().isoformat()}.json"
