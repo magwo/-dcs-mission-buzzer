@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import datetime
 import random
-from utils import Heading
+from utils import Heading, Speed
 
 from dcs.weather import Wind
 from loggin_util import print_bold
@@ -47,6 +47,7 @@ class BuzzResult:
     def wind_dict(self, wind: Wind):
         return {
             "speed_mps": f'{wind.speed:.1f}',
+            "speed_kts": f'{Speed.from_meters_per_second(wind.speed).knots:.0f}',
             "direction": str(int(wind.direction)),
             "direction_opposite": str(int(Heading(wind.direction).opposite.degrees))
         }
