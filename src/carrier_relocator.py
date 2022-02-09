@@ -26,7 +26,7 @@ carrier_type_ids = [
     LHA_Tarawa.id,
 ]
 
-carrier_deck_angles: dict[str, int] = {
+carrier_deck_angles: dict[str, float] = {
     Stennis.id: -9.12,
     Forrestal.id: -9.12,
     CVN_71.id: -9.12,
@@ -73,7 +73,7 @@ class CarrierRelocator:
 
         carrier = group.units[0]
         cruise = CarrierRelocator.get_carrier_cruise(
-            self.wind_0m, carrier_deck_angles.get(carrier.type), Speed.from_knots(25)
+            self.wind_0m, carrier_deck_angles[carrier.type], Speed.from_knots(25)
         )
         print(f"Wind is {self.wind_0m.speed}m/s {self.wind_0m.direction}deg")
         print("Cruise is", cruise)
@@ -138,7 +138,7 @@ class CarrierRelocator:
 
     @staticmethod
     def get_carrier_cruise(
-        wind: Wind, deck_angle: int, desired_apparent_wind: Speed
+        wind: Wind, deck_angle: float, desired_apparent_wind: Speed
     ) -> HeadingAndSpeed:
         wind_speed = Speed.from_meters_per_second(wind.speed)
 
