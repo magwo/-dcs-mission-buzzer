@@ -84,7 +84,7 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
-        body_path: releasenotes.md
+        # body_path: releasenotes.md
         draft: false
         #prerelease: ${{ steps.version.outputs.prerelease }}
 
