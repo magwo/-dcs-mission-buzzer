@@ -8,7 +8,7 @@ analysis = Analysis(
     pathex=['.'],
     binaries=[],
     datas=[
-        ('resources', 'resources')
+        ('resources', 'resources'),
         ('settings.json', '.')
     ],
     hookspath=[],
