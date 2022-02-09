@@ -12,6 +12,7 @@ from dcs.drawing import Rgba
 
 INCLUDED_TASKS = set([task.Refueling, task.AWACS])
 
+
 @dataclass
 class TrackDrawer:
     m: Mission
@@ -30,11 +31,19 @@ class TrackDrawer:
                             self.draw_track(group, 1, 2)
                             break
 
-
     def draw_track(self, group: Group, wp1_index: int, wp2_index: int) -> None:
         altitude = Distance(group.points[wp1_index].alt).feet
         altitude_rounded = round(altitude / 1000)
         path_name = f"{group.name} {altitude_rounded} 000'"
         layer = self.m.drawings.get_layer(StandardLayer.Common)
-        polygon = add_oblong(layer, group.points[wp1_index].position, group.points[wp2_index].position, Distance.from_nautical_miles(5).meters, Rgba(50, 50, 50, 255), 3, Rgba(50, 50, 50, 30), path_name)
+        polygon = add_oblong(
+            layer,
+            group.points[wp1_index].position,
+            group.points[wp2_index].position,
+            Distance.from_nautical_miles(5).meters,
+            Rgba(50, 50, 50, 255),
+            3,
+            Rgba(50, 50, 50, 30),
+            path_name,
+        )
         polygon.line_style = LineStyle.Dot

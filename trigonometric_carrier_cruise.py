@@ -3,17 +3,20 @@
 from math import sin, cos, asin, acos, atan, pi, sqrt
 from sys import argv, stderr
 
-def get_ship_course_and_speed(wind_direction_deg, wind_speed_knots, apparent_wind_speed_knots):
+
+def get_ship_course_and_speed(
+    wind_direction_deg, wind_speed_knots, apparent_wind_speed_knots
+):
     w = wind_speed_knots
     a = apparent_wind_speed_knots
-    DA = 9 * pi / 180 # Deck Angle
-    V_MIN = 3 # The minimum speed the boat is allowed to go
+    DA = 9 * pi / 180  # Deck Angle
+    V_MIN = 3  # The minimum speed the boat is allowed to go
 
     # Check if we have too much wind
     if w + cos(DA) * V_MIN > a:
         # Set boat speed to minimum
         v = V_MIN
-        
+
         # Put apparent wind along the angled deck given v = V_MIN
         C = sqrt(cos(DA) ** 2 / sin(DA) ** 2 + 1)
         theta = asin(v / (w * C)) - asin(-1 / C)
@@ -39,14 +42,20 @@ def main():
         w = float(argv[2])
         a = float(argv[3])
     except:
-        print(f"Please run the script with the required arguments: > python {argv[0]} wind_heading_deg wind_speed_knots required_apparent_wind_knots", file=stderr)
+        print(
+            f"Please run the script with the required arguments: > python {argv[0]} wind_heading_deg wind_speed_knots required_apparent_wind_knots",
+            file=stderr,
+        )
         exit(1)
 
-    h, s, ad = get_ship_course_and_speed(wd, w, a)  
+    h, s, ad = get_ship_course_and_speed(wd, w, a)
 
-    print(f'{"Ship Heading:":22}{h:4.1f}\n'
-          f'{"Ship Speed:":22}{s:4.1f}\n'
-          f'{"Apparent wind angle:":22}{ad:4.1f}')
+    print(
+        f'{"Ship Heading:":22}{h:4.1f}\n'
+        f'{"Ship Speed:":22}{s:4.1f}\n'
+        f'{"Apparent wind angle:":22}{ad:4.1f}'
+    )
+
 
 if __name__ == "__main__":
     main()

@@ -15,7 +15,7 @@ from utils import Distance, Heading, meters, interpolate, Pressure, inches_hg
 from seasonalconditions import determine_season
 
 if TYPE_CHECKING:
-    #from game.theater import ConflictTheater
+    # from game.theater import ConflictTheater
     from seasonalconditions import SeasonalConditions
 
 
@@ -298,9 +298,7 @@ class Conditions:
         day: datetime.date,
         time_of_day: TimeOfDay,
     ) -> Conditions:
-        _start_time = cls.generate_start_time(
-            day, time_of_day
-        )
+        _start_time = cls.generate_start_time(day, time_of_day)
         return cls(
             time_of_day=time_of_day,
             start_time=_start_time,
