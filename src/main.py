@@ -2,42 +2,36 @@ from datetime import datetime
 import os
 from buzzer import Buzzer
 from carrier_relocator import CarrierRelocator
-from loggin_util import print_bold, print_warning
+from loggin_util import print_bold
 import dcs
 import sys
 import json
+import argparse
 from pathlib import Path
-import tkinter as tk
-from tkinter import filedialog
 
 from track_drawer import TrackDrawer
 
-root = tk.Tk()
-root.withdraw()
-
-version = "1.2.6"
+version = "1.3.0"
 print_bold(f"DCS Mission Buzzer v{version} by Mags")
 
-in_filename = sys.argv[1] if len(sys.argv) > 1 else None
-if not in_filename:
-    print_bold("Select mission file")
-    in_filename = filedialog.askopenfilename(
-        title="Select mission file", filetypes=[("Mission files", ".miz")]
-    )
+parser = argparse.ArgumentParser(description='"Buzzes" a DCS miz file with region-like and season-like random weather - temperature, winds, clouds, pressure and more. Will also relocate carriers to be moving with correct wind-over-deck.')
+parser.add_argument('--clearweather', dest='clearweather', action='store_true', default=False,
+                    help='Whether to generate random but clear weather')
+parser.add_argument('input_filename', type=str, help='Input miz file path')
+parser.add_argument('output_filename', nargs='?', type=str, default=None, help='Output miz file path. If omitted, a dry run will be performed')
 
-if not in_filename:
-    sys.exit(1)
+args = parser.parse_args()
 
 m = dcs.Mission()
-print("Attempting to load mission file", in_filename)
-m.load_file(in_filename)
-print("Loaded mission file", in_filename)
+print("Attempting to load mission file", args.input_filename)
+m.load_file(args.input_filename)
+print("Loaded mission file", args.input_filename)
 
 with open("settings.json", "r") as f:
     json_content = f.read()
     settings = json.loads(json_content)
     buzzer = Buzzer()
-    result = buzzer.buzz(m, settings)
+    result = buzzer.buzz(m, settings, clearweather=args.clearweather)
 
     if settings.get("relocate_carrier_groups", False):
         relocator = CarrierRelocator(m, result.conditions.weather.wind.at_0m, settings)
@@ -54,14 +48,7 @@ with open("settings.json", "r") as f:
         with open(file_path, "w", encoding="utf-8") as result_file:
             json.dump(result.toDict(), result_file, ensure_ascii=False, indent=4)
 
-out_filename = sys.argv[2] if len(sys.argv) > 2 else None
-if not out_filename:
-    print_bold("Select file to save mission as")
-    out_filename = filedialog.asksaveasfilename(
-        title="Save mission as",
-        filetypes=[("Mission files", ".miz")],
-        initialfile=in_filename,
-    )
+out_filename = args.output_filename
 
 if out_filename:
     print("Attempting to save to {}...".format(out_filename))

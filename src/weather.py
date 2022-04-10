@@ -5,7 +5,9 @@ import logging
 import random
 from dataclasses import dataclass, field
 from enum import Enum
+from turtle import clear
 from typing import Optional, TYPE_CHECKING, Any
+from xmlrpc.client import Boolean
 
 from dcs.cloud_presets import Clouds as PydcsClouds
 from dcs.weather import CloudPreset, Weather as PydcsWeather, Wind
@@ -208,7 +210,7 @@ class Weather:
 class ClearSkies(Weather):
     @property
     def pressure_adjustment(self) -> float:
-        return 0.22
+        return 0.4
 
     @property
     def temperature_adjustment(self) -> float:
@@ -221,7 +223,7 @@ class ClearSkies(Weather):
         return None
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(1, 4)
+        return self.random_wind(1, 5)
 
 
 class Cloudy(Weather):
@@ -241,7 +243,7 @@ class Cloudy(Weather):
         return None
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(1, 4)
+        return self.random_wind(1, 5)
 
 
 class Raining(Weather):
@@ -261,7 +263,7 @@ class Raining(Weather):
         return None
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(1, 6)
+        return self.random_wind(1, 7)
 
 
 class Thunderstorm(Weather):
@@ -282,7 +284,7 @@ class Thunderstorm(Weather):
         )
 
     def generate_wind(self) -> WindConditions:
-        return self.random_wind(1, 8)
+        return self.random_wind(3, 9)
 
 
 @dataclass
@@ -297,12 +299,13 @@ class Conditions:
         seasonal_conditions: SeasonalConditions,
         day: datetime.date,
         time_of_day: TimeOfDay,
+        clearweather: Boolean,
     ) -> Conditions:
         _start_time = cls.generate_start_time(day, time_of_day)
         return cls(
             time_of_day=time_of_day,
             start_time=_start_time,
-            weather=cls.generate_weather(seasonal_conditions, day, time_of_day),
+            weather=cls.generate_weather(seasonal_conditions, day, time_of_day, clearweather),
         )
 
     @classmethod
@@ -326,17 +329,28 @@ class Conditions:
         seasonal_conditions: SeasonalConditions,
         day: datetime.date,
         time_of_day: TimeOfDay,
+        clearweather: Boolean,
     ) -> Weather:
         season = determine_season(day)
         logging.debug("Weather: Season {}".format(season))
+        logging.debug("Forced clear weather? {}".format(clearweather))
         weather_chances = seasonal_conditions.weather_type_chances[season]
-        chances = {
-            Thunderstorm: weather_chances.thunderstorm,
-            Raining: weather_chances.raining,
-            Cloudy: weather_chances.cloudy,
-            ClearSkies: weather_chances.clear_skies,
-        }
-        logging.debug("Weather: Chances {}".format(weather_chances))
+        if not clearweather:
+            chances = {
+                Thunderstorm: weather_chances.thunderstorm,
+                Raining: weather_chances.raining,
+                Cloudy: weather_chances.cloudy,
+                ClearSkies: weather_chances.clear_skies,
+            }
+        else:
+            chances = {
+                Thunderstorm: 0,
+                Raining: 0,
+                Cloudy: 0,
+                ClearSkies: 100,
+            }
+
+        logging.debug("Weather: Chances {}".format(chances))
         weather_type = random.choices(
             list(chances.keys()), weights=list(chances.values())
         )[0]
