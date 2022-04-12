@@ -9,7 +9,7 @@ from dcs.unitgroup import Group, ShipGroup
 from drawing import add_oblong
 from trigonometric_carrier_cruise import get_ship_course_and_speed
 
-from utils import Distance, Heading, Speed
+from utils import Distance, Heading, Speed, knots
 from dcs.weather import Wind
 from loggin_util import print_bold, print_warning
 from dcs.mission import Mission
@@ -67,7 +67,7 @@ class CarrierRelocator:
         radius = Distance.from_nautical_miles(
             self.settings.get("carrier_relocation_radius_nm", 50)
         )
-        while len(group.points) < 2:
+        while len(group.points) < 4:
             print_warning(f"Carrier group {group.name} missing waypoint")
             group.add_point(MovingPoint())
 
@@ -92,10 +92,21 @@ class CarrierRelocator:
 
         group.points[0].position = carrier_start_pos
         group.points[0].speed = cruise.speed.meters_per_second
+        
         group.points[1].position = carrier_end_pos
         group.points[1].ETA_locked = False
         group.points[1].speed = cruise.speed.meters_per_second
         group.points[1].speed_locked = True
+
+        group.points[2].position = carrier_start_pos
+        group.points[2].speed = knots(50)
+        group.points[2].ETA_locked = False
+        group.points[2].speed_locked = True
+
+        group.points[3].position = carrier_end_pos
+        group.points[3].ETA_locked = False
+        group.points[3].speed = cruise.speed.meters_per_second
+        group.points[3].speed_locked = True
 
         # These are probably not needed anymore
         # carrier.position = carrier_start_pos
