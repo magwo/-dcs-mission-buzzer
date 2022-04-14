@@ -99,7 +99,7 @@ class CarrierRelocator:
         group.points[1].speed_locked = True
 
         group.points[2].position = carrier_start_pos
-        group.points[2].speed = knots(50)
+        group.points[2].speed = knots(50).meters_per_second
         group.points[2].ETA_locked = False
         group.points[2].speed_locked = True
 
