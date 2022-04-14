@@ -156,9 +156,9 @@ class Weather:
         wind_direction_2000m = wind_direction + Heading.random(-90, 90)
         wind_direction_8000m = wind_direction + Heading.random(-90, 90)
         at_0m_factor = 1
-        at_2000m_factor = 2
-        at_8000m_factor = 3
-        base_wind = random.randint(minimum, maximum)
+        at_2000m_factor = random.uniform(1.5, 2.5)
+        at_8000m_factor = random.uniform(2.0, 4.0)
+        base_wind = random.uniform(minimum, maximum)
 
         return WindConditions(
             # Always some wind to make the smoke move a bit.
