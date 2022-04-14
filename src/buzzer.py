@@ -69,17 +69,12 @@ class BuzzResult:
 
 
 class Buzzer:
-    def buzz(self, m: Mission, settings: dict, clearweather=False, force_night=False) -> BuzzResult:
+    def buzz(self, m: Mission, settings: dict, donotbuzz=False, clearweather=False, force_night=False) -> BuzzResult:
         if settings.get("random_seed_method") == "THEATER_AND_TODAYS_DATE":
             seed = f"{m.terrain.name}_{str(datetime.datetime.now().date())}"
             print("Seed is", seed)
             random.seed(seed)
 
-        seasonal_conditions = Buzzer.get_seasonal_conditions(m.terrain)
-        date = Buzzer.get_random_date(
-            settings.get("random_date_range").get("start"),
-            settings.get("random_date_range").get("end"),
-        )
         if not force_night:
             day_time_chances = settings.get("day_time_chances")
         else:
@@ -90,7 +85,18 @@ class Buzzer:
         )[0]
         time_of_day = TimeOfDay[time_of_day]
         print("Time of day", time_of_day)
-        conditions = Conditions.generate(seasonal_conditions, date, time_of_day, clearweather)
+
+        if not donotbuzz:
+            print("Buzzing weather!");
+            seasonal_conditions = Buzzer.get_seasonal_conditions(m.terrain)
+            date = Buzzer.get_random_date(
+                settings.get("random_date_range").get("start"),
+                settings.get("random_date_range").get("end"),
+            )
+            conditions = Conditions.generate(seasonal_conditions, date, time_of_day, clearweather)
+        else:
+            print("SKIPPING weather buzz step!");
+            conditions = Conditions.get_from_mission(m, time_of_day)
 
         print_bold("Conditions as follows!")
         print("Date and time:", conditions.start_time)

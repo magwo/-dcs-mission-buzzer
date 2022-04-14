@@ -8,6 +8,7 @@ from enum import Enum
 from turtle import clear
 from typing import Optional, TYPE_CHECKING, Any
 from xmlrpc.client import Boolean
+from dcs import Mission
 
 from dcs.cloud_presets import Clouds as PydcsClouds
 from dcs.weather import CloudPreset, Weather as PydcsWeather, Wind
@@ -292,6 +293,17 @@ class Conditions:
     time_of_day: TimeOfDay
     start_time: datetime.datetime
     weather: Weather
+
+    @classmethod
+    def get_from_mission(cls, m: Mission) -> Conditions:
+        return cls(
+            time_of_day=TimeOfDay.Day, # Incorrect, but no biggie
+            start_time=m.start_time,
+            weather=Weather(
+                seasonal_conditions: SeasonalConditions,
+                day: datetime.date,
+                time_of_day: TimeOfDay,
+            ))
 
     @classmethod
     def generate(
