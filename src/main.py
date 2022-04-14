@@ -47,6 +47,12 @@ if not args.donotbuzz:
 else:
     print("Skipping buzzing step")
 
+if args.output_filename is not None and settings.get("briefing_replacement_string", "") != "":
+    mission_name = args.output_filename.replace(".miz", "")
+    replacement_string = settings.get("briefing_replacement_string", "")
+    m.set_description_text(m.description_text().replace(replacement_string, mission_name))
+    print("Desc text is now", m.description_text())
+
 if args.limitmap:
     print("Applying map limitation")
     map_limiter = MapLimiter(m)

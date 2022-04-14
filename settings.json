@@ -13,5 +13,6 @@
     "write_result_json": true,
     "result_json_path": "conditions",
     "relocate_carrier_groups": true,
-    "carrier_relocation_radius_nm": 50
+    "carrier_relocation_radius_nm": 50,
+    "briefing_replacement_string": "Work File"
 }
