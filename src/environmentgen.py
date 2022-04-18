@@ -1,6 +1,7 @@
 from typing import Optional
 
 from dcs.mission import Mission
+from dcs.weather import Weather as PydcsWeather
 
 from weather import Clouds, Fog, Conditions, WindConditions, AtmosphericConditions
 
@@ -16,12 +17,17 @@ class EnvironmentGenerator:
 
     def set_clouds(self, clouds: Optional[Clouds]) -> None:
         if clouds is None:
-            return
-        self.mission.weather.clouds_base = clouds.base
-        self.mission.weather.clouds_thickness = clouds.thickness
-        self.mission.weather.clouds_density = clouds.density
-        self.mission.weather.clouds_iprecptns = clouds.precipitation
-        self.mission.weather.clouds_preset = clouds.preset
+            self.mission.weather.clouds_thickness = 200
+            self.mission.weather.clouds_density = 0
+            self.mission.weather.clouds_base = 300
+            self.mission.weather.clouds_iprecptns = PydcsWeather.Preceptions.None_
+            self.mission.weather.clouds_preset = None
+        else:
+            self.mission.weather.clouds_base = clouds.base
+            self.mission.weather.clouds_thickness = clouds.thickness
+            self.mission.weather.clouds_density = clouds.density
+            self.mission.weather.clouds_iprecptns = clouds.precipitation
+            self.mission.weather.clouds_preset = clouds.preset
 
     def set_fog(self, fog: Optional[Fog]) -> None:
         if fog is None:

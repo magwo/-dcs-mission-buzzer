@@ -5,7 +5,6 @@ import logging
 import random
 from dataclasses import dataclass, field
 from enum import Enum
-from turtle import clear
 from typing import Optional, TYPE_CHECKING, Any
 from xmlrpc.client import Boolean
 
