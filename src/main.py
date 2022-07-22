@@ -67,6 +67,12 @@ if settings.get("draw_tanker_tracks", True):
     track_drawer = TrackDrawer(m, settings)
     track_drawer.draw_tracks()
 
+if settings.get("remove_module_requirements", True):
+    if hasattr(m, "requiredModules"):
+        print("Found required modules", m.requiredModules)
+        m["requiredModules"] = {}
+        
+
 out_filename = args.output_filename
 
 if out_filename:

@@ -15,5 +15,6 @@
     "relocate_carrier_groups": true,
     "carrier_relocation_radius_nm": 50,
     "briefing_replacement_string": "Work File",
-    "excluded_drawing_group_names": "SHELL3 103X (USN),ExampleGroup123"
+    "excluded_drawing_group_names": "SHELL3 103X (USN),ExampleGroup123",
+    "remove_module_requirements": true
 }
