@@ -11,6 +11,5 @@
 * DCS
 
 ## Usage
-
-* Activate env
-* `python main.py myOriginalMission.miz myBuzzedMission.miz`
+* (Optional) Modify settings.json to liking
+* `mission-buzzer.exe myOriginalMission.miz myBuzzedMission.miz`
