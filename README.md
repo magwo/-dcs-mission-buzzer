@@ -12,4 +12,4 @@
 
 ## Usage
 * (Optional) Modify settings.json to liking
-* `mission-buzzer.exe myOriginalMission.miz myBuzzedMission.miz`
+* `dcs_mission_buzzer.exe myOriginalMission.miz myBuzzedMission.miz`
