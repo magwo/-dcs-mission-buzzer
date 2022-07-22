@@ -1,5 +1,6 @@
 {
-    "random_date_range": {
+    "date_pick_method": "COMPRESSED_SEASONS",
+    "date_range": {
         "start": "2004-01-01",
         "end": "2012-01-01"
     },

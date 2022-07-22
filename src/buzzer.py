@@ -76,10 +76,18 @@ class Buzzer:
             random.seed(seed)
 
         seasonal_conditions = Buzzer.get_seasonal_conditions(m.terrain)
-        date = Buzzer.get_random_date(
-            settings.get("random_date_range").get("start"),
-            settings.get("random_date_range").get("end"),
-        )
+        if settings.get("date_pick_method") == "COMPRESSED_SEASONS":
+            date = Buzzer.get_compressed_date(
+                settings.get("date_range").get("start"),
+                settings.get("date_range").get("end"),
+                datetime.datetime.now().date(),
+                12
+            )
+        else:
+            date = Buzzer.get_random_date(
+                settings.get("date_range").get("start"),
+                settings.get("date_range").get("end"),
+            )
         if not force_night:
             day_time_chances = settings.get("day_time_chances")
         else:
@@ -151,3 +159,13 @@ class Buzzer:
         start_date = datetime.datetime.fromisoformat(start_date_iso)
         end_date = datetime.datetime.fromisoformat(end_date_iso)
         return random_date(start_date, end_date)
+
+    @staticmethod
+    def get_compressed_date(start_date_iso: str, end_date_iso: str, today_date_irl: datetime, compression_factor: int) -> datetime.datetime:
+        start_date = datetime.datetime.fromisoformat(start_date_iso)
+        end_date = datetime.datetime.fromisoformat(end_date_iso)
+        num_days = (end_date - start_date).days
+        irl_day_of_year = today_date_irl.timetuple().tm_yday
+        chosen_day_number = (irl_day_of_year * compression_factor) % num_days
+        result_date = start_date + datetime.timedelta(days=chosen_day_number)
+        return result_date

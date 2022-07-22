@@ -11,7 +11,7 @@ from map_limiter import MapLimiter
 
 from track_drawer import TrackDrawer
 
-version = "1.4.5"
+version = "1.5.0"
 print_bold(f"DCS Mission Buzzer v{version} by Mags")
 
 parser = argparse.ArgumentParser(description='"Buzzes" a DCS miz file with region-like and season-like random weather - temperature, winds, clouds, pressure and more. Will also relocate carriers to be moving with correct wind-over-deck.')
