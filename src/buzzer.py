@@ -97,8 +97,21 @@ class Buzzer:
             list(day_time_chances.keys()), weights=list(day_time_chances.values())
         )[0]
         time_of_day = TimeOfDay[time_of_day]
+        
+        # Handle forced night wind - used to avoid ILS/RWY problems in DCS
+        min_wind_dir = Heading.from_degrees(0)
+        max_wind_dir = Heading.from_degrees(359)
+        min_wind_speed = Speed.from_meters_per_second(0)
+        if time_of_day == TimeOfDay.Night and settings.get("night_forced_wind") is not None:
+            min_wind_dir = Heading.from_degrees(settings.get("night_forced_wind").get("min_direction_towards", 0))
+            max_wind_dir = Heading.from_degrees(settings.get("night_forced_wind").get("max_direction_towards", 359))
+            min_wind_speed = Speed.from_meters_per_second(settings.get("night_forced_wind").get("min_speed_mps", 0))
+
+        print("Min wind dir", min_wind_dir)
+        print("Max wind dir", max_wind_dir)
+        print("Min wind spd", min_wind_speed)
         print("Time of day", time_of_day)
-        conditions = Conditions.generate(seasonal_conditions, date, time_of_day, clearweather)
+        conditions = Conditions.generate(seasonal_conditions, date, time_of_day, clearweather, min_wind_dir, max_wind_dir, min_wind_speed)
 
         print_bold("Conditions as follows!")
         print("Date and time:", conditions.start_time)

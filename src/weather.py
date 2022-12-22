@@ -11,7 +11,7 @@ from xmlrpc.client import Boolean
 from dcs.cloud_presets import Clouds as PydcsClouds
 from dcs.weather import CloudPreset, Weather as PydcsWeather, Wind
 
-from utils import Distance, Heading, meters, interpolate, Pressure, inches_hg
+from utils import Distance, Heading, Speed, meters, interpolate, Pressure, inches_hg
 
 from seasonalconditions import determine_season
 
@@ -80,15 +80,16 @@ class Weather:
         seasonal_conditions: SeasonalConditions,
         day: datetime.date,
         time_of_day: TimeOfDay,
+        min_wind_dir: Heading,
+        max_wind_dir: Heading,
+        min_wind_speed: Speed
     ) -> None:
-        # Future improvement: Use theater, day and time of day
-        # to get a more realistic conditions
         self.atmospheric = self.generate_atmospheric(
             seasonal_conditions, day, time_of_day
         )
         self.clouds = self.generate_clouds()
         self.fog = self.generate_fog()
-        self.wind = self.generate_wind()
+        self.wind = self.generate_wind(min_wind_dir, max_wind_dir, min_wind_speed)
 
     def generate_atmospheric(
         self,
@@ -146,18 +147,23 @@ class Weather:
             thickness=random.randint(100, 500),
         )
 
-    def generate_wind(self) -> WindConditions:
+    def generate_wind(
+            self,
+            min_wind_dir: Heading,
+            max_wind_dir: Heading,
+            min_wind_speed: Speed) -> WindConditions:
         raise NotImplementedError
 
     @staticmethod
-    def random_wind(minimum: int, maximum: int) -> WindConditions:
-        wind_direction = Heading.random(0, 360)
+    def random_wind(minimum_speed: Speed, maximum_speed: Speed, min_direction: Heading, max_direction: Heading) -> WindConditions:
+        wind_direction = Heading.random(min_direction.degrees, max_direction.degrees)
         wind_direction_2000m = wind_direction + Heading.random(-90, 90)
         wind_direction_8000m = wind_direction + Heading.random(-90, 90)
+        print("Wind direction is", wind_direction)
         at_0m_factor = 1
         at_2000m_factor = random.uniform(1.5, 2.5)
         at_8000m_factor = random.uniform(2.0, 4.0)
-        base_wind = random.uniform(minimum, maximum)
+        base_wind = random.uniform(minimum_speed.meters_per_second, maximum_speed.meters_per_second)
 
         return WindConditions(
             # Always some wind to make the smoke move a bit.
@@ -221,8 +227,17 @@ class ClearSkies(Weather):
     def generate_fog(self) -> Optional[Fog]:
         return None
 
-    def generate_wind(self) -> WindConditions:
-        return self.random_wind(1, 5)
+    def generate_wind(
+        self,
+        min_wind_dir: Heading,
+        max_wind_dir: Heading,
+        min_wind_speed: Speed
+    ) -> WindConditions:
+        return self.random_wind(
+            max(Speed.from_meters_per_second(1), min_wind_speed),
+            max(Speed.from_meters_per_second(5), min_wind_speed),
+            min_wind_dir,
+            max_wind_dir)
 
 
 class Cloudy(Weather):
@@ -241,8 +256,17 @@ class Cloudy(Weather):
         # DCS 2.7 says to not use fog with the cloud presets.
         return None
 
-    def generate_wind(self) -> WindConditions:
-        return self.random_wind(1, 5)
+    def generate_wind(
+        self,
+        min_wind_dir: Heading,
+        max_wind_dir: Heading,
+        min_wind_speed: Speed
+    ) -> WindConditions:
+        return self.random_wind(
+            max(Speed.from_meters_per_second(1), min_wind_speed),
+            max(Speed.from_meters_per_second(5), min_wind_speed),
+            min_wind_dir,
+            max_wind_dir)
 
 
 class Raining(Weather):
@@ -261,8 +285,17 @@ class Raining(Weather):
         # DCS 2.7 says to not use fog with the cloud presets.
         return None
 
-    def generate_wind(self) -> WindConditions:
-        return self.random_wind(1, 7)
+    def generate_wind(
+        self,
+        min_wind_dir: Heading,
+        max_wind_dir: Heading,
+        min_wind_speed: Speed
+    ) -> WindConditions:
+        return self.random_wind(
+            max(Speed.from_meters_per_second(1), min_wind_speed),
+            max(Speed.from_meters_per_second(8), min_wind_speed),
+            min_wind_dir,
+            max_wind_dir)
 
 
 class Thunderstorm(Weather):
@@ -282,8 +315,17 @@ class Thunderstorm(Weather):
             precipitation=PydcsWeather.Preceptions.Thunderstorm,
         )
 
-    def generate_wind(self) -> WindConditions:
-        return self.random_wind(3, 9)
+    def generate_wind(
+        self,
+        min_wind_dir: Heading,
+        max_wind_dir: Heading,
+        min_wind_speed: Speed
+    ) -> WindConditions:
+        return self.random_wind(
+            max(Speed.from_meters_per_second(3), min_wind_speed),
+            max(Speed.from_meters_per_second(11), min_wind_speed),
+            min_wind_dir,
+            max_wind_dir)
 
 
 @dataclass
@@ -299,12 +341,15 @@ class Conditions:
         day: datetime.date,
         time_of_day: TimeOfDay,
         clearweather: Boolean,
+        min_wind_dir: Heading,
+        max_wind_dir: Heading,
+        min_wind_speed: Speed
     ) -> Conditions:
         _start_time = cls.generate_start_time(day, time_of_day)
         return cls(
             time_of_day=time_of_day,
             start_time=_start_time,
-            weather=cls.generate_weather(seasonal_conditions, day, time_of_day, clearweather),
+            weather=cls.generate_weather(seasonal_conditions, day, time_of_day, clearweather, min_wind_dir, max_wind_dir, min_wind_speed),
         )
 
     @classmethod
@@ -329,6 +374,9 @@ class Conditions:
         day: datetime.date,
         time_of_day: TimeOfDay,
         clearweather: Boolean,
+        min_wind_dir: Heading,
+        max_wind_dir: Heading,
+        min_wind_speed: Speed
     ) -> Weather:
         season = determine_season(day)
         logging.debug("Weather: Season {}".format(season))
@@ -354,4 +402,4 @@ class Conditions:
             list(chances.keys()), weights=list(chances.values())
         )[0]
         logging.debug("Weather: Type {}".format(weather_type))
-        return weather_type(seasonal_conditions, day, time_of_day)
+        return weather_type(seasonal_conditions, day, time_of_day, min_wind_dir, max_wind_dir, min_wind_speed)
