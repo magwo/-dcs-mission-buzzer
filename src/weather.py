@@ -234,8 +234,8 @@ class ClearSkies(Weather):
         min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
-            max(Speed.from_meters_per_second(1), min_wind_speed),
-            max(Speed.from_meters_per_second(5), min_wind_speed),
+            max(Speed.from_meters_per_second(2), min_wind_speed),
+            max(Speed.from_meters_per_second(8), min_wind_speed),
             min_wind_dir,
             max_wind_dir)
 
@@ -263,8 +263,8 @@ class Cloudy(Weather):
         min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
-            max(Speed.from_meters_per_second(1), min_wind_speed),
-            max(Speed.from_meters_per_second(5), min_wind_speed),
+            max(Speed.from_meters_per_second(2), min_wind_speed),
+            max(Speed.from_meters_per_second(8), min_wind_speed),
             min_wind_dir,
             max_wind_dir)
 
@@ -292,8 +292,8 @@ class Raining(Weather):
         min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
-            max(Speed.from_meters_per_second(1), min_wind_speed),
-            max(Speed.from_meters_per_second(8), min_wind_speed),
+            max(Speed.from_meters_per_second(2), min_wind_speed),
+            max(Speed.from_meters_per_second(12), min_wind_speed),
             min_wind_dir,
             max_wind_dir)
 
@@ -322,8 +322,8 @@ class Thunderstorm(Weather):
         min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
-            max(Speed.from_meters_per_second(3), min_wind_speed),
-            max(Speed.from_meters_per_second(11), min_wind_speed),
+            max(Speed.from_meters_per_second(4), min_wind_speed),
+            max(Speed.from_meters_per_second(15), min_wind_speed),
             min_wind_dir,
             max_wind_dir)
 
