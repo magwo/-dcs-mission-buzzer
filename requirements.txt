@@ -5,7 +5,7 @@ future==0.18.2
 mypy==0.921
 mypy-extensions==0.4.3
 pefile==2021.5.24
--e git+https://github.com/pydcs/dcs@e006f0df6db933fa34b2d5cb04db41653537503e#egg=pydcs
+-e git+https://github.com/pydcs/dcs@fe541426f36889d7e0275b71656f5c2db2c617ce#egg=pydcs
 pyinstaller==4.4
 pyinstaller-hooks-contrib==2021.2
 pyproj==3.3.0
