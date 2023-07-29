@@ -69,9 +69,9 @@ class BuzzResult:
 
 
 class Buzzer:
-    def buzz(self, m: Mission, settings: dict, clearweather=False, force_night=False) -> BuzzResult:
+    def buzz(self, m: Mission, settings: dict, today_irl_date: datetime.date, clearweather=False, force_night=False) -> BuzzResult:
         if settings.get("random_seed_method") == "THEATER_AND_TODAYS_DATE":
-            seed = f"{m.terrain.name}_{str(datetime.datetime.now().date())}"
+            seed = f"{m.terrain.name}_{str(today_irl_date)}"
             print("Seed is", seed)
             random.seed(seed)
 
@@ -80,13 +80,13 @@ class Buzzer:
             date = Buzzer.get_compressed_date(
                 settings.get("date_range").get("start"),
                 settings.get("date_range").get("end"),
-                datetime.datetime.now().date(),
+                today_irl_date,
                 12
             )
         else:
             date = Buzzer.get_random_date(
                 settings.get("date_range").get("start"),
-                settings.get("date_range").get("end"),
+                settings.get("date_range").get("end")
             )
         if not force_night:
             day_time_chances = settings.get("day_time_chances")

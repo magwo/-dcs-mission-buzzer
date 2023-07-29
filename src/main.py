@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from buzzer import Buzzer
 from carrier_relocator import CarrierRelocator
@@ -11,7 +11,7 @@ from map_limiter import MapLimiter
 
 from track_drawer import TrackDrawer
 
-version = "1.5.3"
+version = "1.5.4"
 print_bold(f"DCS Mission Buzzer v{version} by Mags")
 
 parser = argparse.ArgumentParser(description='"Buzzes" a DCS miz file with region-like and season-like random weather - temperature, winds, clouds, pressure and more. Will also relocate carriers to be moving with correct wind-over-deck.')
@@ -43,7 +43,8 @@ with open("settings.json", "r") as f:
 
 if not args.donotbuzz:
     buzzer = Buzzer()
-    result = buzzer.buzz(m, settings, clearweather=args.clearweather, force_night=args.forcenight)
+    today_irl_date = datetime.now().date()
+    result = buzzer.buzz(m, settings, today_irl_date, clearweather=args.clearweather, force_night=args.forcenight)
 else:
     print("Skipping buzzing step")
 
@@ -83,8 +84,19 @@ else:
     print("Dry run was completed")
 
 if (result is not None) and settings.get("write_result_json") and args.weatherreport:
-    filename = f"{result.theater}{datetime.now().date().isoformat()}.json"
+    # Create prognosis for tomorrow's weather
+    tomorrow_irl_date = today_irl_date + timedelta(days=1)
+    print("PROGNOSIS: Making prognosis for tomorrow ({})".format(tomorrow_irl_date))
+    m_prognosis = dcs.Mission()
+    print("PROGNOSIS: Attempting to load mission file", args.input_filename)
+    m_prognosis.load_file(args.input_filename)
+    prognosis_result = buzzer.buzz(m_prognosis, settings, tomorrow_irl_date, clearweather=args.clearweather, force_night=args.forcenight)
+    print("PROGNOSIS: Result is {}".format(prognosis_result))
+
+    filename = f"{result.theater}{today_irl_date.isoformat()}.json"
     file_path = Path(settings.get("result_json_path"), filename)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "w", encoding="utf-8") as result_file:
-        json.dump(result.toDict(), result_file, ensure_ascii=False, indent=4)
+        result_dict = result.toDict()
+        result_dict["prognosis_tomorrow"] = prognosis_result.toDict()
+        json.dump(result_dict, result_file, ensure_ascii=False, indent=4)
