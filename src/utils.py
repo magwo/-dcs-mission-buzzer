@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import itertools
+from collections.abc import Iterable
 import math
 import random
-from collections import Iterable
 from dataclasses import dataclass
 from typing import Union, Any, TypeVar
 
