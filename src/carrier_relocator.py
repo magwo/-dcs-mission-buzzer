@@ -92,7 +92,7 @@ class CarrierRelocator:
 
         group.points[0].position = carrier_start_pos
         group.points[0].speed = cruise.speed.meters_per_second
-        
+
         group.points[1].position = carrier_end_pos
         group.points[1].ETA_locked = False
         group.points[1].speed = cruise.speed.meters_per_second

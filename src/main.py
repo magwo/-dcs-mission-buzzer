@@ -14,19 +14,52 @@ from track_drawer import TrackDrawer
 version = "1.5.8"
 print_bold(f"DCS Mission Buzzer v{version} by Mags")
 
-parser = argparse.ArgumentParser(description='"Buzzes" a DCS miz file with region-like and season-like random weather - temperature, winds, clouds, pressure and more. Will also relocate carriers to be moving with correct wind-over-deck.')
-parser.add_argument('--clearweather', dest='clearweather', action='store_true', default=False,
-                    help='Whether to generate random but clear weather')
-parser.add_argument('--forcenight', dest='forcenight', action='store_true', default=False,
-                    help='Whether to set start time to night time')
-parser.add_argument('--weatherreport', dest='weatherreport', action='store_true', default=False,
-                    help='Whether to generate weather report file')
-parser.add_argument('--limitmap', dest='limitmap', action='store_true', default=False,
-                    help='Whether to limit F10 map to see no units')
-parser.add_argument('--donotbuzz', dest='donotbuzz', action='store_true', default=False,
-                    help='Whether to skip the buzzing step completely')
-parser.add_argument('input_filename', type=str, help='Input miz file path')
-parser.add_argument('output_filename', nargs='?', type=str, default=None, help='Output miz file path. If omitted, a dry run will be performed')
+parser = argparse.ArgumentParser(
+    description='"Buzzes" a DCS miz file with region-like and season-like random weather - temperature, winds, clouds, pressure and more. Will also relocate carriers to be moving with correct wind-over-deck.'
+)
+parser.add_argument(
+    "--clearweather",
+    dest="clearweather",
+    action="store_true",
+    default=False,
+    help="Whether to generate random but clear weather",
+)
+parser.add_argument(
+    "--forcenight",
+    dest="forcenight",
+    action="store_true",
+    default=False,
+    help="Whether to set start time to night time",
+)
+parser.add_argument(
+    "--weatherreport",
+    dest="weatherreport",
+    action="store_true",
+    default=False,
+    help="Whether to generate weather report file",
+)
+parser.add_argument(
+    "--limitmap",
+    dest="limitmap",
+    action="store_true",
+    default=False,
+    help="Whether to limit F10 map to see no units",
+)
+parser.add_argument(
+    "--donotbuzz",
+    dest="donotbuzz",
+    action="store_true",
+    default=False,
+    help="Whether to skip the buzzing step completely",
+)
+parser.add_argument("input_filename", type=str, help="Input miz file path")
+parser.add_argument(
+    "output_filename",
+    nargs="?",
+    type=str,
+    default=None,
+    help="Output miz file path. If omitted, a dry run will be performed",
+)
 
 args = parser.parse_args()
 
@@ -44,15 +77,26 @@ with open("settings.json", "r") as f:
 if not args.donotbuzz:
     buzzer = Buzzer()
     today_irl_date = datetime.now().date()
-    result = buzzer.buzz(m, settings, today_irl_date, clearweather=args.clearweather, force_night=args.forcenight)
+    result = buzzer.buzz(
+        m,
+        settings,
+        today_irl_date,
+        clearweather=args.clearweather,
+        force_night=args.forcenight,
+    )
 else:
     print("Skipping buzzing step")
 
-if args.output_filename is not None and settings.get("briefing_replacement_string", "") != "":
+if (
+    args.output_filename is not None
+    and settings.get("briefing_replacement_string", "") != ""
+):
     mission_name = os.path.basename(args.output_filename).replace(".miz", "")
     print("Mission name is", mission_name)
     replacement_string = settings.get("briefing_replacement_string", "")
-    m.set_description_text(m.description_text().replace(replacement_string, mission_name))
+    m.set_description_text(
+        m.description_text().replace(replacement_string, mission_name)
+    )
 
 if args.limitmap:
     print("Applying map limitation")
@@ -72,7 +116,7 @@ if settings.get("remove_module_requirements", True):
     if hasattr(m, "requiredModules"):
         print("Found required modules", m.requiredModules)
         m["requiredModules"] = {}
-        
+
 
 out_filename = args.output_filename
 
@@ -90,7 +134,13 @@ if (result is not None) and settings.get("write_result_json") and args.weatherre
     m_prognosis = dcs.Mission()
     print("PROGNOSIS: Attempting to load mission file", args.input_filename)
     m_prognosis.load_file(args.input_filename)
-    prognosis_result = buzzer.buzz(m_prognosis, settings, tomorrow_irl_date, clearweather=args.clearweather, force_night=args.forcenight)
+    prognosis_result = buzzer.buzz(
+        m_prognosis,
+        settings,
+        tomorrow_irl_date,
+        clearweather=args.clearweather,
+        force_night=args.forcenight,
+    )
     print("PROGNOSIS: Result is {}".format(prognosis_result))
 
     filename = f"{result.theater}{today_irl_date.isoformat()}.json"

@@ -20,7 +20,9 @@ class TrackDrawer:
 
     def draw_tracks(self) -> None:
         m = self.m
-        excluded_group_names = self.settings.get("excluded_drawing_group_names", "").split(",")
+        excluded_group_names = self.settings.get(
+            "excluded_drawing_group_names", ""
+        ).split(",")
 
         for coalition_name in m.coalition:
             for country_name in m.coalition[coalition_name].countries:

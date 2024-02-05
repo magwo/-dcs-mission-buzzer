@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dcs.forcedoptions import ForcedOptions
 from dcs.mission import Mission
 
+
 @dataclass
 class MapLimiter:
     m: Mission

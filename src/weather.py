@@ -82,7 +82,7 @@ class Weather:
         time_of_day: TimeOfDay,
         min_wind_dir: Heading,
         max_wind_dir: Heading,
-        min_wind_speed: Speed
+        min_wind_speed: Speed,
     ) -> None:
         self.atmospheric = self.generate_atmospheric(
             seasonal_conditions, day, time_of_day
@@ -148,14 +148,17 @@ class Weather:
         )
 
     def generate_wind(
-            self,
-            min_wind_dir: Heading,
-            max_wind_dir: Heading,
-            min_wind_speed: Speed) -> WindConditions:
+        self, min_wind_dir: Heading, max_wind_dir: Heading, min_wind_speed: Speed
+    ) -> WindConditions:
         raise NotImplementedError
 
     @staticmethod
-    def random_wind(minimum_speed: Speed, maximum_speed: Speed, min_direction: Heading, max_direction: Heading) -> WindConditions:
+    def random_wind(
+        minimum_speed: Speed,
+        maximum_speed: Speed,
+        min_direction: Heading,
+        max_direction: Heading,
+    ) -> WindConditions:
         wind_direction = Heading.random(min_direction.degrees, max_direction.degrees)
         wind_direction_2000m = wind_direction + Heading.random(-90, 90)
         wind_direction_8000m = wind_direction + Heading.random(-90, 90)
@@ -163,7 +166,9 @@ class Weather:
         at_0m_factor = 1
         at_2000m_factor = random.uniform(1.5, 2.5)
         at_8000m_factor = random.uniform(2.0, 4.0)
-        base_wind = random.uniform(minimum_speed.meters_per_second, maximum_speed.meters_per_second)
+        base_wind = random.uniform(
+            minimum_speed.meters_per_second, maximum_speed.meters_per_second
+        )
 
         return WindConditions(
             # Always some wind to make the smoke move a bit.
@@ -228,16 +233,14 @@ class ClearSkies(Weather):
         return None
 
     def generate_wind(
-        self,
-        min_wind_dir: Heading,
-        max_wind_dir: Heading,
-        min_wind_speed: Speed
+        self, min_wind_dir: Heading, max_wind_dir: Heading, min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
             max(Speed.from_meters_per_second(2), min_wind_speed),
             max(Speed.from_meters_per_second(8), min_wind_speed),
             min_wind_dir,
-            max_wind_dir)
+            max_wind_dir,
+        )
 
 
 class Cloudy(Weather):
@@ -257,16 +260,14 @@ class Cloudy(Weather):
         return None
 
     def generate_wind(
-        self,
-        min_wind_dir: Heading,
-        max_wind_dir: Heading,
-        min_wind_speed: Speed
+        self, min_wind_dir: Heading, max_wind_dir: Heading, min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
             max(Speed.from_meters_per_second(2), min_wind_speed),
             max(Speed.from_meters_per_second(8), min_wind_speed),
             min_wind_dir,
-            max_wind_dir)
+            max_wind_dir,
+        )
 
 
 class Raining(Weather):
@@ -286,16 +287,14 @@ class Raining(Weather):
         return None
 
     def generate_wind(
-        self,
-        min_wind_dir: Heading,
-        max_wind_dir: Heading,
-        min_wind_speed: Speed
+        self, min_wind_dir: Heading, max_wind_dir: Heading, min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
             max(Speed.from_meters_per_second(2), min_wind_speed),
             max(Speed.from_meters_per_second(12), min_wind_speed),
             min_wind_dir,
-            max_wind_dir)
+            max_wind_dir,
+        )
 
 
 class Thunderstorm(Weather):
@@ -316,16 +315,14 @@ class Thunderstorm(Weather):
         )
 
     def generate_wind(
-        self,
-        min_wind_dir: Heading,
-        max_wind_dir: Heading,
-        min_wind_speed: Speed
+        self, min_wind_dir: Heading, max_wind_dir: Heading, min_wind_speed: Speed
     ) -> WindConditions:
         return self.random_wind(
             max(Speed.from_meters_per_second(4), min_wind_speed),
             max(Speed.from_meters_per_second(15), min_wind_speed),
             min_wind_dir,
-            max_wind_dir)
+            max_wind_dir,
+        )
 
 
 @dataclass
@@ -343,13 +340,21 @@ class Conditions:
         clearweather: Boolean,
         min_wind_dir: Heading,
         max_wind_dir: Heading,
-        min_wind_speed: Speed
+        min_wind_speed: Speed,
     ) -> Conditions:
         _start_time = cls.generate_start_time(day, time_of_day)
         return cls(
             time_of_day=time_of_day,
             start_time=_start_time,
-            weather=cls.generate_weather(seasonal_conditions, day, time_of_day, clearweather, min_wind_dir, max_wind_dir, min_wind_speed),
+            weather=cls.generate_weather(
+                seasonal_conditions,
+                day,
+                time_of_day,
+                clearweather,
+                min_wind_dir,
+                max_wind_dir,
+                min_wind_speed,
+            ),
         )
 
     @classmethod
@@ -376,7 +381,7 @@ class Conditions:
         clearweather: Boolean,
         min_wind_dir: Heading,
         max_wind_dir: Heading,
-        min_wind_speed: Speed
+        min_wind_speed: Speed,
     ) -> Weather:
         season = determine_season(day)
         logging.debug("Weather: Season {}".format(season))
@@ -402,4 +407,11 @@ class Conditions:
             list(chances.keys()), weights=list(chances.values())
         )[0]
         logging.debug("Weather: Type {}".format(weather_type))
-        return weather_type(seasonal_conditions, day, time_of_day, min_wind_dir, max_wind_dir, min_wind_speed)
+        return weather_type(
+            seasonal_conditions,
+            day,
+            time_of_day,
+            min_wind_dir,
+            max_wind_dir,
+            min_wind_speed,
+        )

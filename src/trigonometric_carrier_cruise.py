@@ -23,7 +23,7 @@ def get_ship_course_and_speed(
     # Check if we have too little wind
     elif a * sin(DA) > w:
         theta = pi / 2
-        v = sqrt(a ** 2 - w ** 2)
+        v = sqrt(a**2 - w**2)
     else:
         theta = asin(a * sin(DA) / w)
         v = a * cos(DA) - w * cos(theta)

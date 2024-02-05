@@ -35,25 +35,32 @@ class BuzzResult:
             "temperature_c": f"{self.conditions.weather.atmospheric.temperature_celsius:.0f}",
             "qnh_inches_hg": f"{self.conditions.weather.atmospheric.qnh.inches_hg:.2f}",
             "qnh_hecto_pascals": f"{self.conditions.weather.atmospheric.qnh.hecto_pascals:.1f}",
-            "precipitation": self.conditions.weather.clouds.precipitation.name.replace(
-                "_", ""
-            )
-            if self.conditions.weather.clouds
-            else "None",
-            "cloud_preset": self.conditions.weather.clouds.preset.ui_name
-            if self.conditions.weather.clouds and self.conditions.weather.clouds.preset
-            else "None",
-            "cloud_base": str(self.conditions.weather.clouds.base)
-            if self.conditions.weather.clouds
-            else "-",
-            "fog_visibility_meters": str(
-                int(self.conditions.weather.fog.visibility.meters)
-            )
-            if self.conditions.weather.fog
-            else "-",
-            "fog_thickness": str(self.conditions.weather.fog.thickness)
-            if self.conditions.weather.fog
-            else "-",
+            "precipitation": (
+                self.conditions.weather.clouds.precipitation.name.replace("_", "")
+                if self.conditions.weather.clouds
+                else "None"
+            ),
+            "cloud_preset": (
+                self.conditions.weather.clouds.preset.ui_name
+                if self.conditions.weather.clouds
+                and self.conditions.weather.clouds.preset
+                else "None"
+            ),
+            "cloud_base": (
+                str(self.conditions.weather.clouds.base)
+                if self.conditions.weather.clouds
+                else "-"
+            ),
+            "fog_visibility_meters": (
+                str(int(self.conditions.weather.fog.visibility.meters))
+                if self.conditions.weather.fog
+                else "-"
+            ),
+            "fog_thickness": (
+                str(self.conditions.weather.fog.thickness)
+                if self.conditions.weather.fog
+                else "-"
+            ),
             "wind_0m": self.wind_dict(self.conditions.weather.wind.at_0m),
             "wind_2000m": self.wind_dict(self.conditions.weather.wind.at_2000m),
             "wind_8000m": self.wind_dict(self.conditions.weather.wind.at_8000m),
@@ -69,7 +76,14 @@ class BuzzResult:
 
 
 class Buzzer:
-    def buzz(self, m: Mission, settings: dict, today_irl_date: datetime.date, clearweather=False, force_night=False) -> BuzzResult:
+    def buzz(
+        self,
+        m: Mission,
+        settings: dict,
+        today_irl_date: datetime.date,
+        clearweather=False,
+        force_night=False,
+    ) -> BuzzResult:
         if settings.get("random_seed_method") == "THEATER_AND_TODAYS_DATE":
             seed = f"{m.terrain.name}_{str(today_irl_date)}"
             print("Seed is", seed)
@@ -81,12 +95,12 @@ class Buzzer:
                 settings.get("date_range").get("start"),
                 settings.get("date_range").get("end"),
                 today_irl_date,
-                12
+                12,
             )
         else:
             date = Buzzer.get_random_date(
                 settings.get("date_range").get("start"),
-                settings.get("date_range").get("end")
+                settings.get("date_range").get("end"),
             )
         if not force_night:
             day_time_chances = settings.get("day_time_chances")
@@ -97,21 +111,38 @@ class Buzzer:
             list(day_time_chances.keys()), weights=list(day_time_chances.values())
         )[0]
         time_of_day = TimeOfDay[time_of_day]
-        
+
         # Handle forced night wind - used to avoid ILS/RWY problems in DCS
         min_wind_dir = Heading.from_degrees(0)
         max_wind_dir = Heading.from_degrees(359)
         min_wind_speed = Speed.from_meters_per_second(0)
-        if time_of_day == TimeOfDay.Night and settings.get("night_forced_wind") is not None:
-            min_wind_dir = Heading.from_degrees(settings.get("night_forced_wind").get("min_direction_towards", 0))
-            max_wind_dir = Heading.from_degrees(settings.get("night_forced_wind").get("max_direction_towards", 359))
-            min_wind_speed = Speed.from_meters_per_second(settings.get("night_forced_wind").get("min_speed_mps", 0))
+        if (
+            time_of_day == TimeOfDay.Night
+            and settings.get("night_forced_wind") is not None
+        ):
+            min_wind_dir = Heading.from_degrees(
+                settings.get("night_forced_wind").get("min_direction_towards", 0)
+            )
+            max_wind_dir = Heading.from_degrees(
+                settings.get("night_forced_wind").get("max_direction_towards", 359)
+            )
+            min_wind_speed = Speed.from_meters_per_second(
+                settings.get("night_forced_wind").get("min_speed_mps", 0)
+            )
 
         print("Min wind dir", min_wind_dir)
         print("Max wind dir", max_wind_dir)
         print("Min wind spd", min_wind_speed)
         print("Time of day", time_of_day)
-        conditions = Conditions.generate(seasonal_conditions, date, time_of_day, clearweather, min_wind_dir, max_wind_dir, min_wind_speed)
+        conditions = Conditions.generate(
+            seasonal_conditions,
+            date,
+            time_of_day,
+            clearweather,
+            min_wind_dir,
+            max_wind_dir,
+            min_wind_speed,
+        )
 
         print_bold("Conditions as follows!")
         print("Date and time:", conditions.start_time)
@@ -174,7 +205,12 @@ class Buzzer:
         return random_date(start_date, end_date)
 
     @staticmethod
-    def get_compressed_date(start_date_iso: str, end_date_iso: str, today_date_irl: datetime, compression_factor: int) -> datetime.datetime:
+    def get_compressed_date(
+        start_date_iso: str,
+        end_date_iso: str,
+        today_date_irl: datetime,
+        compression_factor: int,
+    ) -> datetime.datetime:
         start_date = datetime.datetime.fromisoformat(start_date_iso)
         end_date = datetime.datetime.fromisoformat(end_date_iso)
         num_days = (end_date - start_date).days
