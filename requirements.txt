@@ -12,7 +12,7 @@ packaging==23.2
 pathspec==0.12.1
 pefile==2023.2.7
 platformdirs==4.2.0
-pydcs @ git+https://github.com/magwo/dcs@ae858514b86d4543936689c446c088471efb0eee
+pydcs @ git+https://github.com/pydcs/dcs@2ab1bcc55d13ce7417eff54e2eb6a6e512fc2b51
 pyinstaller==6.3.0
 pyinstaller-hooks-contrib==2024.0
 pyproj==3.6.1
