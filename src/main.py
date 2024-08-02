@@ -11,7 +11,7 @@ from map_limiter import MapLimiter
 
 from track_drawer import TrackDrawer
 
-version = "1.5.9"
+version = "1.5.10"
 print_bold(f"DCS Mission Buzzer v{version} by Mags")
 
 parser = argparse.ArgumentParser(
